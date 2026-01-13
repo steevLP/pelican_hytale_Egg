@@ -1,0 +1,38 @@
+{
+    "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY PANEL",
+    "meta": {
+        "version": "PLCN_v3",
+        "update_url": null
+    },
+    "exported_at": "2026-01-13T20:49:09+00:00",
+    "name": "Hytale",
+    "author": "steev@slpnetwork.de",
+    "uuid": "b8d48bd6-9a9b-4394-a950-54eb0a7daff9",
+    "description": null,
+    "image": null,
+    "tags": [
+        "hytale"
+    ],
+    "features": [],
+    "docker_images": {
+        "Java 25": "ghcr.io/parkervcp/yolks:java_25"
+    },
+    "file_denylist": [],
+    "startup_commands": {
+        "Default startup": "java -jar HytaleServer.jar --assets ./Assets.zip"
+    },
+    "config": {
+        "files": "{\n}",
+        "startup": "{\n    \"done\":\"[HytaleServer]          Hytale Server Booted! \"\n}",
+        "logs": "[]",
+        "stop": "stop"
+    },
+    "scripts": {
+        "installation": {
+            "script": "hytale_zip=\"hytale-downloader.zip\"\r\nassets_zp= \"Assets.zip\"\r\nfound_archive=\"\"\r\n\r\nif [[ ! -d /mnt/server ]]; then\r\n    mkdir /mnt/server\r\nfi\r\n\r\ncd /mnt/server\r\n\r\necho \"installing unzip\"\r\napt update\r\napt install -y unzip wget file\r\n\r\necho \"downloading hytale server downloader\"\r\nwget https://downloader.hytale.com/hytale-downloader.zip\r\n\r\nunzip -q -o $hytale_zip\r\nchmod +x \"hytale-downloader-linux-amd64\"\r\necho \"you will need to authorize with hytale\" \r\n./hytale-downloader-linux-amd64\r\n\r\necho \"searching for hytale server\"\r\n \r\nfor file in *.zip; do\r\n    [[ -e \"$file\" ]] || continue\r\n    if [[ \"$file\" != \"$DOWNLOADER_ZIP\" && \"$file\" != \"$ASSETS_ZIP\" ]]; then\r\n        echo \"server found: $file\"\r\n        found_archive=$file\r\n\r\n        break\r\n    fi\r\ndone\r\n\r\nif [[ -z \"$found_archive\" ]]; then\r\n    echo \"something went wrong no server found\"\r\n    exit 1\r\nfi\r\n\r\necho \"starting installation of server from zip file: $found_archive\"\r\nunzip $found_archive\r\n\r\necho \"clean up\"\r\nrm \"hytale-downloader*\"\r\nrm \"$found_archive\"\r\n\r\necho \"moving server\"\r\n\r\nFOLDER_NAME=\"${found_archive%.zip}\"\r\n\r\nif [[ -d \"Server\" ]]; then\r\n    target=\"Server\"\r\nelif [[ -d \"$FOLDER_NAME\" ]]; then\r\n    target=\"$FOLDER_NAME\"\r\nfi\r\n\r\nif [[ -n \"$target\" ]]; then\r\n    echo \"Log: Verschiebe Dateien aus /$target in das Hauptverzeichnis...\"\r\n    shopt -s dotglob\r\n    mv \"$target\"/* .\r\n    shopt -u dotglob\r\n    rmdir \"$target\"\r\nfi\r\n\r\nrm -rf \"Server\"\r\necho \"install complete starting server\"",
+            "container": "ghcr.io/pterodactyl/installers:debian",
+            "entrypoint": "bash"
+        }
+    },
+    "variables": []
+}
